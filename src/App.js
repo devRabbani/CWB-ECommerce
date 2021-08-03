@@ -8,7 +8,7 @@ import Header from './components/header/header.component'
 
 import SignInSignUp from './pages/signIn-signUp-page/signIn-signUp.component'
 
-import { auth } from './firebase/firebase.util'
+import { auth, createUserDocument } from './firebase/firebase.util'
 
 class App extends Component {
   state = {
@@ -16,10 +16,23 @@ class App extends Component {
   }
 
   unSubscribeFromAuth = null
+
   componentDidMount() {
-    auth.onAuthStateChanged((user) => {
-      this.setState({ currentUser: user })
-      console.log(user)
+    this.unSubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
+      if (userAuth) {
+        const userRef = await createUserDocument(userAuth)
+
+        userRef.onSnapshot((snapshot) => {
+          this.setState({
+            currentUser: {
+              id: snapshot.id,
+              ...snapshot.data(),
+            },
+          })
+        })
+      } else {
+        this.setState({ currentUser: userAuth })
+      }
     })
   }
 
