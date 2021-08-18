@@ -3,19 +3,23 @@ import Button from '../button/button.component'
 import './cartMenu.style.scss'
 
 import { connect } from 'react-redux'
+import CartItem from '../cartItem/cartItem.component'
 
-const CartMenu = ({ hidden }) => {
+const CartMenu = ({ cartItems }) => {
   return (
     <div className='cart-dropdown'>
-      {console.log(hidden)}
-      <div className='cart-items' />
+      <div className='cart-items'>
+        {cartItems.map((cartItem) => (
+          <CartItem key={cartItem.id} item={cartItem} />
+        ))}
+      </div>
       <Button>CHECKOUT</Button>
     </div>
   )
 }
 
-const mapStateToProps = (state) => ({
-  hidden: state.cart.hidden,
+const mapStateToProps = ({ cart: { cartItems } }) => ({
+  cartItems,
 })
 
 export default connect(mapStateToProps)(CartMenu)
